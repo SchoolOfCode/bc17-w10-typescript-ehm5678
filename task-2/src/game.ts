@@ -1,3 +1,7 @@
+/** Define types for choices and outcomes */
+type Choice = 'ROCK' | 'PAPER' | 'SCISSORS';
+type Outcome = 'WIN' | 'DRAW' | 'LOSS';
+
 /** Some related "constants" which represent the various outcomes a round can have. */
 export const OUTCOME_WIN = "WIN";
 export const OUTCOME_DRAW = "DRAW";
@@ -26,7 +30,7 @@ export function getRandomComputerMove() {
 /**
  * Should return either: "ROCK", "PAPER", "SCISSORS" (or null if the user cancelled)
  */
-export function getPlayerMove() {
+export function getPlayerMove(): Choice | null  {
   while (true) {
     const rawInput = prompt("Enter a move: rock/paper/scissors");
     const userHasCancelled = null === rawInput;
@@ -50,7 +54,7 @@ export function getPlayerMove() {
 }
 
 /** Should return an outcome. Either "WIN", "LOSS" or "DRAW" */
-export function getOutcomeForRound(playerChoice, computerChoice) {
+export function getOutcomeForRound(playerChoice: Choice, computerChoice: Choice): Outcome {
   const playerHasDrawn = playerChoice === computerChoice;
 
   if (playerHasDrawn) {
@@ -69,10 +73,23 @@ export function getOutcomeForRound(playerChoice, computerChoice) {
   return OUTCOME_LOSS;
 }
 
+/** Define types for round results and game model */
+interface RoundResult {
+  playerMove: Choice;
+  computerMove: Choice;
+  outcome: Outcome;
+}
+
+interface GameModel {
+  playerScore: number;
+  computerScore: number;
+}
+
+
 /** Should return an object containing information about the played round. */
-export function playOneRound() {
+export function playOneRound(): RoundResult | null {
   const playerMove = getPlayerMove();
-  if (null === playerMove) {
+  if (playerMove === null) {
     return null;
   }
 
@@ -106,7 +123,8 @@ export function playGame() {
   }
 }
 
-export function updateModel(model, dataForRound) {
+/** Function to update game model based on the round outcome */
+export function updateModel(model: GameModel, dataForRound: RoundResult): GameModel {
   switch (dataForRound.outcome) {
     case OUTCOME_WIN:
       return { ...model, playerScore: model.playerScore + 1 };
@@ -117,14 +135,15 @@ export function updateModel(model, dataForRound) {
   }
 }
 
-export function showProgressInConsole(dataForRound, model) {
+/** Function to display the current game progress in the console */
+export function showProgressInConsole(dataForRound: RoundResult, model: GameModel): void {
   console.table([
     {
-      "Your choice": dataForRound.playerMove,
-      "Computer choice": dataForRound.computerMove,
+      'Your choice': dataForRound.playerMove,
+      'Computer choice': dataForRound.computerMove,
       Outcome: dataForRound.outcome,
-      "Your score": model.playerScore,
-      "Computer score": model.computerScore,
+      'Your score': model.playerScore,
+      'Computer score': model.computerScore,
     },
   ]);
 }
